@@ -14,7 +14,14 @@ jobs:
     steps:
     - name: Checkout code
       uses: actions/checkout@v4
+      with:
+        lfs: false
 
+    - name: Fix file encoding issues
+      run: |
+        # Находим все C# файлы и убираем BOM если он есть
+        find . -name "*.cs" -type f -exec sed -i '1s/^\xEF\xBB\xBF//' {} \;
+        
     - name: Setup .NET
       uses: actions/setup-dotnet@v4
       with:
