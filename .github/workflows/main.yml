@@ -17,10 +17,14 @@ jobs:
       with:
         lfs: false
 
-    - name: Fix file encoding issues
+    - name: Fix encoding comprehensively
       run: |
-        # Находим все C# файлы и убираем BOM если он есть
-        find . -name "*.cs" -type f -exec sed -i '1s/^\xEF\xBB\xBF//' {} \;
+        find . -name "*.cs" -type f | while read file; do
+          if [ -f "$file" ]; then
+            iconv -f UTF-8 -t UTF-8 "$file" | sed '1s/^\xEF\xBB\xBF//' > "${file}.tmp"
+            mv "${file}.tmp" "$file"
+          fi
+        done
         
     - name: Setup .NET
       uses: actions/setup-dotnet@v4
